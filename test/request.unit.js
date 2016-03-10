@@ -138,7 +138,7 @@ describe('request', function () {
             ctx.replyQueue.queue, sinon.match.func, put(ctx.opts.consumeOpts, { noAck: true }))
           sinon.assert.calledOnce(ctx.channel.sendToQueue)
           sinon.assert.calledWith(ctx.channel.sendToQueue,
-            ctx.rpcQueueName, bufferMatch(ctx.bufferContent), ctx.opts.sendOpts)
+            ctx.rpcQueueName, bufferMatch(ctx.bufferContent), put(ctx.opts.sendOpts, { correlationId: ctx.corrId, replyTo: ctx.replyQueue.queue}))
           sinon.assert.calledOnce(ctx.channel.close)
           done()
         })
@@ -208,7 +208,7 @@ describe('request', function () {
                 queue: ctx.rpcQueueName,
                 content: ctx.content,
                 opts: {
-                  sendOpts: ctx.opts.sendOpts,
+                  sendOpts: put(ctx.opts.sendOpts, {correlationId: ctx.corrId}),
                   queueOpts: put(ctx.opts.queueOpts, {exclusive: true}),
                   consumeOpts: put(ctx.opts.consumeOpts, {noAck: true})
                 }
@@ -247,7 +247,7 @@ describe('request', function () {
               content: ctx.content,
               opts: {
                 timeout: ctx.opts.timeout,
-                sendOpts: ctx.opts.sendOpts,
+                sendOpts: put(ctx.opts.sendOpts, {correlationId: ctx.corrId, replyTo: ctx.replyQueue.queue}),
                 queueOpts: put(ctx.opts.queueOpts, {exclusive: true}),
                 consumeOpts: put(ctx.opts.consumeOpts, {noAck: true})
               }
